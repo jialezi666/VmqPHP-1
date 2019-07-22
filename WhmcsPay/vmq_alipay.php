@@ -43,7 +43,7 @@ function vmq_alipay_link($params) {
 	   $RandomString = chr(rand(97, 122)).chr(rand(97, 122)).chr(rand(97, 122)).chr(rand(97, 122)).chr(rand(97, 122));
 	   $PayID = $RandomString.'|'.$params['invoiceid'];
 	   $PaySign = md5('alipay'.$PayID.$params['amount'].$params['systemurl'].'/modules/gateways/vmq_alipay/callback.php'.trim($params['appsk']));
-	   $GetInfo = json_decode(vmq_alipay_curl_post(trim($params['appurl']),array("appkey"=>trim($params['appsk']),"payid"=>$PayID,"type"=>'alipay',"price"=>$params['amount'],"sign"=>$PaySign,"notifyurl"=>$params['systemurl'].'/modules/gateways/vmq_alipay/callback.php')),true);
+	   $GetInfo = json_decode(vmq_alipay_curl_post(trim($params['appurl']).'/createorder',array("appkey"=>trim($params['appsk']),"payid"=>$PayID,"type"=>'alipay',"price"=>$params['amount'],"sign"=>$PaySign,"notifyurl"=>$params['systemurl'].'/modules/gateways/vmq_alipay/callback.php')),true);
 	   if(!$GetInfo){
 		   exit('订单添加错误：服务器未返回任何有效信息');
 	   }
@@ -57,8 +57,8 @@ function vmq_alipay_link($params) {
 	   $userdata['make_time'] = date('Y-m-d H:i:s',$GetInfo['data']['maketime']);
 	   $userdata['end_time'] = date('Y-m-d H:i:s',$GetInfo['data']['stoptime']);
 	   $userdata['order_id'] = $GetInfo['data']['orderid'];
-	   $userdata['outTime'] = ($GetInfo['data']['timeout']) * 60;
-	   $userdata['logoShowTime'] = 2;
+	   $userdata['outTime'] = $GetInfo['data']['timeout'];
+	   $userdata['logoShowTime'] = 1;
 	   exit(vmq_alipay_makehtml(json_encode($userdata)));
 	}
     if(stristr($_SERVER['PHP_SELF'],'viewinvoice')){
